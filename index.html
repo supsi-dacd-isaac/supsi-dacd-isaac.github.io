@@ -63,6 +63,13 @@ h3 {
 	margin-bottom: 0;
 }
 
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
 .page-title {
 	font-size: 2.5rem;
 	font-weight: 700;
@@ -93,11 +100,18 @@ h3 {
 }
 
 .callout {
-	border-radius: 3px;
+	border-radius: 10px;
 	padding: 1rem;
 }
 
-figure {
+/* For default-background callouts, render the border outline. */
+.callout.block-color-default_background {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+figure,
+aside,
+details {
 	margin: 1.25em 0;
 	page-break-inside: avoid;
 }
@@ -135,38 +149,66 @@ img {
 		max-height: 100vh;
 		object-fit: contain;
 	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
 }
 
 @page {
 	margin: 1in;
 }
 
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
 .collection-content {
 	font-size: 0.875rem;
 }
 
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
 .column-list {
 	display: flex;
-	justify-content: space-between;
+	gap: 46px;
 }
 
 .column {
-	padding: 0 1em;
+	min-width: 0;
+	overflow: hidden;
 }
 
-.column:first-child {
-	padding-left: 0;
-}
-
-.column:last-child {
-	padding-right: 0;
+.column > *:first-child {
+	margin-top: 0;
 }
 
 .table_of_contents-item {
 	display: block;
 	font-size: 0.875rem;
 	line-height: 1.3;
-	padding: 0.125rem;
+	padding-inline: 0.125rem;
+	padding-block: 0.375rem;
 }
 
 .table_of_contents-indent-1 {
@@ -191,10 +233,10 @@ table,
 th,
 td {
 	border: 1px solid rgba(55, 53, 47, 0.09);
-	border-collapse: collapse;
 }
 
 table {
+	border-collapse: collapse;
 	border-left: none;
 	border-right: none;
 }
@@ -257,6 +299,14 @@ ol {
 	padding-inline-start: 1.6em;
 }
 
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
 ol > li {
 	padding-left: 0.2em;
 }
@@ -300,7 +350,7 @@ ol > li {
 }
 
 .page-description {
-    margin-bottom: 2em;
+	margin-bottom: 2em;
 }
 
 .simple-table {
@@ -331,7 +381,9 @@ time {
 }
 
 .icon {
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	max-width: 1.2em;
 	max-height: 1.2em;
 	text-decoration: none;
@@ -339,8 +391,34 @@ time {
 	margin-right: 0.5em;
 }
 
+/*
+ * Render emoji icons using a ::before pseudo-element to keep the glyph
+ * out of the DOM textContent traversal. This avoids double-rendering icons
+ * in callouts and page titles.
+ * NOTE(slim/html-export-pseudo-icons): I can't tagref this because it will
+ * flag as a duplicate tag after codegen.
+ */
+.icon[data-emoji]::before {
+	content: attr(data-emoji);
+}
+
 img.icon {
 	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
 }
 
 .user-icon {
@@ -397,8 +475,7 @@ td > time {
 }
 
 input[type="checkbox"] {
-	transform: scale(1.5);
-	margin-right: 0.6em;
+	margin-right: 0.4em;
 	vertical-align: middle;
 }
 
@@ -446,10 +523,14 @@ code {
 }
 
 blockquote {
-	font-size: 1.25em;
+	font-size: 1em;
 	margin: 1em 0;
 	padding-left: 1em;
 	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
 }
 
 .bookmark {
@@ -504,14 +585,20 @@ blockquote {
 	margin-top: 0.25em;
 }
 
-.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.tab {
+	margin: 1.25em 0;
+	padding-inline: 1rem;
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
 .code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
 .serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
 .mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
-.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
-.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
-.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
-.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
 .pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
 .pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
 .pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
@@ -525,159 +612,155 @@ blockquote {
 .pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
 .pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
 .highlight-default {
-	color: rgba(55, 53, 47, 1);
+	color: rgba(44, 44, 43, 1);
 }
 .highlight-gray {
-	color: rgba(120, 119, 116, 1);
-	fill: rgba(120, 119, 116, 1);
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
 }
 .highlight-brown {
-	color: rgba(159, 107, 83, 1);
-	fill: rgba(159, 107, 83, 1);
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
 }
 .highlight-orange {
-	color: rgba(217, 115, 13, 1);
-	fill: rgba(217, 115, 13, 1);
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
 }
 .highlight-yellow {
-	color: rgba(203, 145, 47, 1);
-	fill: rgba(203, 145, 47, 1);
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
 }
 .highlight-teal {
-	color: rgba(68, 131, 97, 1);
-	fill: rgba(68, 131, 97, 1);
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
 }
 .highlight-blue {
-	color: rgba(51, 126, 169, 1);
-	fill: rgba(51, 126, 169, 1);
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
 }
 .highlight-purple {
-	color: rgba(144, 101, 176, 1);
-	fill: rgba(144, 101, 176, 1);
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
 }
 .highlight-pink {
 	color: rgba(193, 76, 138, 1);
 	fill: rgba(193, 76, 138, 1);
 }
 .highlight-red {
-	color: rgba(212, 76, 71, 1);
-	fill: rgba(212, 76, 71, 1);
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
 }
 .highlight-default_background {
-	color: rgba(55, 53, 47, 1);
+	color: rgba(44, 44, 43, 1);
 }
 .highlight-gray_background {
-	background: rgba(241, 241, 239, 1);
+	background: rgba(42, 28, 0, 0.07);
 }
 .highlight-brown_background {
-	background: rgba(244, 238, 238, 1);
+	background: rgba(139, 46, 0, 0.086);
 }
 .highlight-orange_background {
-	background: rgba(251, 236, 221, 1);
+	background: rgba(224, 101, 1, 0.129);
 }
 .highlight-yellow_background {
-	background: rgba(251, 243, 219, 1);
+	background: rgba(211, 168, 0, 0.137);
 }
 .highlight-teal_background {
-	background: rgba(237, 243, 236, 1);
+	background: rgba(0, 100, 45, 0.09);
 }
 .highlight-blue_background {
-	background: rgba(231, 243, 248, 1);
+	background: rgba(0, 124, 215, 0.094);
 }
 .highlight-purple_background {
-	background: rgba(244, 240, 247, 0.8);
+	background: rgba(102, 0, 178, 0.078);
 }
 .highlight-pink_background {
-	background: rgba(249, 238, 243, 0.8);
+	background: rgba(197, 0, 93, 0.086);
 }
 .highlight-red_background {
-	background: rgba(253, 235, 236, 1);
+	background: rgba(223, 22, 0, 0.094);
 }
 .block-color-default {
 	color: inherit;
 	fill: inherit;
 }
 .block-color-gray {
-	color: rgba(120, 119, 116, 1);
-	fill: rgba(120, 119, 116, 1);
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
 }
 .block-color-brown {
-	color: rgba(159, 107, 83, 1);
-	fill: rgba(159, 107, 83, 1);
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
 }
 .block-color-orange {
-	color: rgba(217, 115, 13, 1);
-	fill: rgba(217, 115, 13, 1);
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
 }
 .block-color-yellow {
-	color: rgba(203, 145, 47, 1);
-	fill: rgba(203, 145, 47, 1);
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
 }
 .block-color-teal {
-	color: rgba(68, 131, 97, 1);
-	fill: rgba(68, 131, 97, 1);
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
 }
 .block-color-blue {
-	color: rgba(51, 126, 169, 1);
-	fill: rgba(51, 126, 169, 1);
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
 }
 .block-color-purple {
-	color: rgba(144, 101, 176, 1);
-	fill: rgba(144, 101, 176, 1);
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
 }
 .block-color-pink {
 	color: rgba(193, 76, 138, 1);
 	fill: rgba(193, 76, 138, 1);
 }
 .block-color-red {
-	color: rgba(212, 76, 71, 1);
-	fill: rgba(212, 76, 71, 1);
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
 }
 .block-color-default_background {
 	color: inherit;
 	fill: inherit;
 }
 .block-color-gray_background {
-	background: rgba(241, 241, 239, 1);
+	background: rgba(240, 239, 237, 1);
 }
 .block-color-brown_background {
-	background: rgba(244, 238, 238, 1);
+	background: rgba(245, 237, 233, 1);
 }
 .block-color-orange_background {
-	background: rgba(251, 236, 221, 1);
+	background: rgba(251, 235, 222, 1);
 }
 .block-color-yellow_background {
-	background: rgba(251, 243, 219, 1);
+	background: rgba(249, 243, 220, 1);
 }
 .block-color-teal_background {
-	background: rgba(237, 243, 236, 1);
+	background: rgba(232, 241, 236, 1);
 }
 .block-color-blue_background {
-	background: rgba(231, 243, 248, 1);
+	background: rgba(229, 242, 252, 1);
 }
 .block-color-purple_background {
-	background: rgba(244, 240, 247, 0.8);
+	background: rgba(243, 235, 249, 1);
 }
 .block-color-pink_background {
-	background: rgba(249, 238, 243, 0.8);
+	background: rgba(250, 233, 241, 1);
 }
 .block-color-red_background {
-	background: rgba(253, 235, 236, 1);
+	background: rgba(252, 233, 231, 1);
 }
-.select-value-color-uiBlue { background-color: rgba(35, 131, 226, .07); }
-.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
-.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
-.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
-.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
-.select-value-color-transparentGray { background-color: rgba(227, 226, 224, 0); }
-.select-value-color-translucentGray { background-color: rgba(0, 0, 0, 0.06); }
-.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
-.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
-.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
-.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
-.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
-.select-value-color-pageGlass { background-color: undefined; }
-.select-value-color-washGlass { background-color: undefined; }
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
 
 .checkbox {
 	display: inline-flex;
@@ -697,59 +780,55 @@ blockquote {
 	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
 }
 	
-</style></head><body><article id="9deaf9ad-7cb4-4bfa-97f9-2b6544d0090b" class="page sans"><header><img class="page-cover-image" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/Supsi_DACD_ISAAC_Smart_Grid_HiRes-9238_mod.jpg" style="object-position:center 33.89%"/><h1 class="page-title">Energy System Sector - Overview </h1><p class="page-description"></p></header><div class="page-body"><figure id="8397aeb7-400c-4d75-af3c-cd20bf96500d" class="image" style="text-align:left"><a href="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/supsi-logo.svg"><img style="width:132px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/supsi-logo.svg"/></a></figure><p id="1d9826c4-f480-41d3-bd2f-2c9cd1360ce8" class="">
-</p><p id="12adc177-9d9b-8062-b62f-c091ac76317b" class="">The Energy Systems Sector is part of the <a href="https://www.supsi.ch/en/isaac">ISAAC institute</a> and operates at both local and international levels, continuously fostering innovation and technological development. The team, composed of experts from diverse disciplines and nationalities, works closely with Swiss polytechnics (ETH Zurich and EPFL) and other significant institutions, both national and international. Noteworthy collaborations include NCCR Automation, a national competence center exploring new approaches for controlling complex automated systems, and the IEA Annex 82 project, focused on energy-flexible buildings for resilient, low-carbon energy systems.</p><p id="12adc177-9d9b-80ea-b9ee-e40781f6f1b9" class="">The sector’s primary goal is achieving the 2050 Energy Strategy, which aims for net-zero greenhouse gas emissions. Activities focus on integrating renewable energies into grids, particularly the electrical grid, and supporting the electrification of key sectors such as mobility and heating. Additionally, the sector is dedicated to developing energy communities, promoting a shared and sustainable use of resources locally, thereby contributing significantly to the country&#x27;s energy transition.</p><p id="12adc177-9d9b-8047-8584-efee49189a70" class="">Collaboration with industry and the public sector, particularly with electric utility companies, is essential for developing practical and applicable solutions. Furthermore, the sector actively works with policymakers, contributing to the definition of sustainable energy policies that support the energy transition.</p><p id="12adc177-9d9b-805e-9f79-f32a3d5b2406" class="">Among its most significant achievements is the founding of <a href="https://www.hivepower.tech/">Hive Power</a>, an innovative startup offering advanced technologies for optimized management of decentralized energy networks. The sector has also won two Watt d&#x27;Or awards from the Swiss Federal Office of Energy, prestigious recognitions for its excellence in energy innovation.</p><h1 id="12adc177-9d9b-80d0-9ab0-e662542b5e93" class="">Our mission</h1><ul id="204bbe2b-a653-481b-843c-22c942f4d52e" class="bulleted-list"><li style="list-style-type:disc">Accelerate the transition to reliable and environmentally sustainable energy systems</li></ul><ul id="95c6e8a8-57ec-49c7-87fb-e457cebea415" class="bulleted-list"><li style="list-style-type:disc">Facilitate their implementation in the built environment</li></ul><ul id="6c78cd34-141a-482c-8200-73f155819806" class="bulleted-list"><li style="list-style-type:disc">Promote the transfer of knowledge to industry, professionals and new generations</li></ul><h1 id="31f806f3-155f-4a22-b8fb-5eeda2f017a2" class="">Research Projects - ongoing </h1><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="103dc177-9d9b-808c-b048-d162caac8b45"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/bundesamt_fuer_energie_logo.jpeg"/></div><div style="width:100%"><h3 id="6a599763-7d5d-402e-9bb3-155700eaa862" class="">   <a href="https://www.aramis.admin.ch/Grunddaten/?ProjectID=53864">PROPER-Grids</a> - Swiss Federal Office of Energy </h3></div></figure><div id="dd75a1cb-22ec-4a63-97b7-a958266fcdcf" class="column-list"><div id="da4555a8-212a-4455-b3f0-56df32182c9d" style="width:12.5%" class="column"><figure id="103dc177-9d9b-80c3-8c2e-f14873b4c37e" class="image"><a href="https://www.aramis.admin.ch/Grunddaten/?ProjectID=53864"><img style="width:240px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/image.png"/></a></figure></div><div id="7851e094-532b-4b33-a6ec-fe3f8306422e" style="width:54.16666666666667%" class="column"><p id="d2c3b5f2-871d-40e4-a0b9-5ef31add6ad7" class=""><strong>P</strong>robabilistic <strong>R</strong>isk-informed <strong>OP</strong>erational scheduling for pow<strong>ER</strong> <strong>Grids</strong>. Safe power grid operations are essential to achieve future sustainability goals and, despite the growing need for uncertainty quantification (UQ), deterministic N-1 methods are often used in practice. However, deterministic methods neglect valuable information about the frequencies of disturbances, resulting in overly conservative operations during low-risk scenarios and potentially unsafe when the risks are higher. This project will bridge this gap by introducing an innovative approach for efficient Probabilistic Risk Assessment (PRA) and risk-informed operational planning. Inspired by recent advancements in probabilistic ML, we will develop a new sampling approach to estimate the probability of rare events while accounting for operational-environmental uncertainties and low-probability cascading failures. We will combine the PRA and efficient UQ tools with a high-fidelity simulator of cascading failures and a forecaster module. The novel harmonized framework will serve as the backbone for future risk-informed decision-making under uncertainty, power grid expansion planning, and risk-aware operational scheduling.</p><p id="cb546747-2e2a-4f9d-9db9-8a8092fbc027" class="">
-</p></div><div id="93df16b0-282d-4f1c-944d-a001a4080f0b" style="width:33.333333333333336%" class="column"><p id="df61b54a-c195-496e-854e-90d700aef71f" class=""><strong>OUR ROLE</strong>: Our group is overseeing and managing the project. We are also in charge of developing tools for probabilistic risk and safety assessment and for designing decision support systems for risk-aware planning and outage scheduling. This project is a collaboration between SUPSI-ETHZ and SwissGrid.</p><p id="bc206dca-a127-4983-a058-b9943668d9f6" class="">
-</p></div></div><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="f3e30f96-bf48-4be8-aa93-bea6ae2d968a"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/bundesamt_fuer_energie_logo.jpeg"/></div><div style="width:100%"><h3 id="bf1ce422-f5a5-4cb2-a13e-5a79e2ad7d22" class=""><a href="https://sweet-sure.ch/">SURE</a> - Swiss Federal Office of Energy </h3></div></figure><div id="a270e2f5-1962-4cb9-91e5-d8d480f56364" class="column-list"><div id="103dc177-9d9b-80ba-a438-fe520d39099b" style="width:12.5%" class="column"><figure id="103dc177-9d9b-80a1-854e-e9b0c78ce1cb" class="image"><a href="https://sweet-sure.ch/"><img style="width:336px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/image%201.png"/></a></figure></div><div id="81ccd285-7786-4f7f-b6eb-e9bc74762f1a" style="width:54.166666666666686%" class="column"><p id="aa5e7fbd-729a-4473-bf89-301e39397d3c" class=""><strong>S</strong>ustainable and <strong>R</strong>esilient <strong>E</strong>nergy for <strong>S</strong>witzerland. SURE aims to analyze the sustainability and resilience of Switzerland’s transition to a carbon-free economy by 2050 through an integrated assessment of various dimensions such as environment, natural resources, public health, economics, supply security, and social well-being. The analysis involves a novel analytical framework that utilizes multiple energy models and quantitative tools to develop narratives of long-term pathways and disruptive events that can affect the energy transition. These storylines have been developed based on the status-quo of knowledge and modelling expertise without assigning any preference or likelihood. Four different storylines and disruptive events are developed to assess the system’s performance across sustainability and resilience indicators. Shock scenarios are used to assess the impact of sudden disruptive events on the energy system.</p><p id="65a69b36-d48a-4e46-b27d-47d420ef8169" class="">
-</p></div><div id="2333d902-1091-4941-835b-bcc6e20bae44" style="width:33.333333333333336%" class="column"><p id="6d405f64-01cb-41bf-ae2f-22d500793b45" class=""><strong>OUR ROLE</strong>: In the SURE project, we conduct a case study for the canton of Ticino, with our primary contribution being the development of a <strong>socio-technical model</strong> that reflects the region&#x27;s unique landscape. This dynamic model, based on a <strong>system dynamics</strong> approach, taking into account the objectives of various actors within complex systems, and considering the economic, social, and environmental factors that influence their decision-making process. The cantonal case study enables us to pre-test policies and evaluate their effectiveness in supporting the transition to a sustainable energy system, while ensuring coherence between federal and regional pathways that align with the expectations and aspirations of local actors.</p><p id="82611668-38a1-4975-babf-81016a80b7dd" class="">
-</p></div></div><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="3509c347-dec3-48de-b9bd-e3ead6db840e"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/tO9kUrDX_400x400.jpg"/></div><div style="width:100%"><h3 id="3541a79b-ad8e-4a66-8acf-823da6e4fb68" class=""><a href="https://fedecom-project.eu/">FEDECOM</a> - Horizon Europe</h3></div></figure><div id="40bb528f-c4f3-4fde-842f-68a06f0a2b73" class="column-list"><div id="103dc177-9d9b-8011-bf08-f41e8fbd0b18" style="width:12.5%" class="column"><figure id="103dc177-9d9b-8062-9648-ea78102d145f" class="image"><a href="https://fedecom-project.eu/"><img style="width:336px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/image%202.png"/></a></figure></div><div id="2f4568c9-4c0e-4d28-9fac-a011ac518122" style="width:54.16666666666667%" class="column"><p id="8bfd7ac5-0b37-490d-8e34-76646b20cbd9" class=""><strong>FEDE</strong>rated “system of systems” approach for flexible and interoperable energy <strong>COM</strong>munities. Building on results of recently (or soon to be) concluded EU projects, FEDECOM aims to enable integrated local energy systems through sector coupling and cross-energy vector integration, increasing RES penetration via optimal utilisation of energy dispatch, storage and conversion assets. FEDECOM pursues the idea of electricity becoming the leading energy carrier, with power grids as the<br/>backbone for the decarbonisation of all energy sectors and aggregators as the cornerstone enabler of the potential exploitation.<br/></p><p id="3ebe3324-d55f-4611-899f-38cb2659ae01" class="">
-</p></div><div id="282e7ead-9162-407a-ab83-4e3c3b6b5832" style="width:33.333333333333336%" class="column"><p id="2b6e5f09-f7b3-47e9-9c5b-79afaaf86b74" class=""><strong>OUR ROLE</strong>: In FEDECOM, we are responsible for generating <strong>optimizable, data-driven models for the electrical grid</strong>, starting from readings from smart meter data. This is a challenging setting since we cannot exploit information on current and voltage angles to identify our models. Furthermore, producing an optimizable model requires the latter to belong to a class of “well-behaving” functions, such as convex regressors. Our second objective in the project is to set up a <strong>smart settlement</strong> and remuneration module using blockchain-based technology. </p><p id="5969e29b-8775-481e-a6c1-27b8b8c987a3" class="">
-</p></div></div><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="103dc177-9d9b-80cb-82e0-d5013f34502a"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/tO9kUrDX_400x400.jpg"/></div><div style="width:100%"><h3 id="d4bc2305-1679-4d55-ad1a-43ec504deabf" class=""><a href="https://reeflexhe.eu/">REEFLEX</a> - Horizon Europe</h3></div></figure><div id="1248d077-165e-4f27-a91c-67745cbc2a84" class="column-list"><div id="84b2ca90-5287-4166-a4c6-3163a1d26e6e" style="width:12.5%" class="column"><figure id="103dc177-9d9b-803f-86c5-dbcad4b92a6e" class="image"><a href="https://reeflexhe.eu/"><img style="width:384px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/image%203.png"/></a></figure></div><div id="921d0f6f-194c-46c9-a936-a96f318486b2" style="width:54.16666666666667%" class="column"><p id="f0f9145a-89e6-4755-9ddf-cd09c4db22c8" class=""><strong>RE</strong>plicable, interoperable, cross-sector solutions and Energy services for demand side <strong>FLEX</strong>ibility markets.  The overall objective of REEFLEX is to develop a set of viable interoperable solutions and services that increase the participation of energy consumers in demand side flexibility (DSF) markets. These services and IT tools build on to the development of a central interoperable platform, which acts as an energy marketplace to connect to all types of stakeholders in the cross-sector energy system, facilitating their access to any flexibility market (local, national, European) and providing a set of interactions and services of the catalogue tailor-made for their energy needs. REEFLEX places special emphasis on the demonstration and replication of these solutions in 7 different countries with different energy constrains to ensure interoperability.</p><p id="2de116ee-982a-4fb4-b033-a8e70a7dffbd" class="">
-</p></div><div id="0022c14d-13c2-4d25-b0de-c2c047a33101" style="width:33.333333333333336%" class="column"><p id="99f60f90-8127-4899-b04b-ecc2d28c92b6" class=""><strong>OUR ROLE</strong>: In REEFLEX we serve as technical partners in running the Swiss pilot site. Besides data gathering and activities connected to the demonstration, <strong>replication and evaluation</strong> of the proposed solution, we are responsible for the generation of baselines and forecasts for the consumption at the point of delivery (PODs). This task involves the setup of a full pipeline from <strong>data ingestion to model serving via dedicated APIs</strong>.  </p><p id="9a910080-49ec-482b-a695-2a0d680be801" class="">
-</p></div></div><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="103dc177-9d9b-8021-9d87-d6a10f004e44"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/tO9kUrDX_400x400.jpg"/></div><div style="width:100%"><h3 id="668ddc26-1912-4a0e-a39d-6d693dafc124" class=""><a href="https://opentunityproject.eu/">OPENTUNITY</a> - Horizon Europe</h3></div></figure><div id="ccc318c0-6a2c-43db-9745-d9d180536cea" class="column-list"><div id="103dc177-9d9b-80b9-b40e-e66c33d2d11a" style="width:12.5%" class="column"><figure id="103dc177-9d9b-80e3-afae-c1df8eb2cc49" class="image"><a href="https://opentunityproject.eu/"><img style="width:578.65625px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/image%204.png"/></a></figure></div><div id="51dd1896-e9d1-4954-b945-a80bf3d4d8d2" style="width:54.16666666666667%" class="column"><p id="7a26537b-f835-44c1-909c-041d72e23d6c" class=""><strong>OPEN</strong>ing the electricity ecosystem to multiple actors in order to have a real decarbonization oppor<strong>TUNITY</strong>.<strong>  </strong>OPENTUNITY’s objective is to create a flexibility ecosystem reducing interoperability barriers and favouring the use of standards in order to decarbonize EU grids and put the end-user in the spotlight. Grid operators, prosumers, market actors etc. will be supported by OPENTUNITY via innovative methodologies backed by advanced, interoperable software modules, in order to provide them with new features and services related to: 1) Technologies to boost flexibility in prosumer’s environment; 2) Technologies for grid operators to better manage grid operations).</p><p id="37fa7194-67ff-434d-b286-5b2f81687383" class="">
-</p></div><div id="15c2b13b-21c2-4d04-bc80-ddf9da131549" style="width:33.333333333333336%" class="column"><p id="50b56f62-8999-4147-b9da-3dc1ae8070b4" class=""><strong>OUR ROLE</strong>:  In OPENTUNITY, we serve as technical partners in running the Swiss pilot site. Besides this, we are involved in tools for grid operators, providing them with powerful grid monitoring and control that will facilitate knowing the grid status in real-time and analyze the flexibility necessities of the grid and kicking-off DR campaigns. Last, we contribute to the design of an open, secure, and trusted platform for data exchange between energy assets and systems by leveraging the concept of Decentralized Identifiers (DIDs) and Verifiable Credentials (VCs) using blockchain technology.</p><p id="23a8ef0e-5c92-47a5-85dc-77e2c3803fe4" class="">
-</p></div></div><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="103dc177-9d9b-809b-b4eb-e4b08b80b82f"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/tO9kUrDX_400x400.jpg"/></div><div style="width:100%"><h3 id="48b77aab-fb87-49e6-834a-93b7fb2f087c" class=""><a href="https://dr-rise.eu/">DR-RISE</a> - Horizon Europe</h3></div></figure><div id="f195afb3-f649-4761-9884-fd1f242d5483" class="column-list"><div id="103dc177-9d9b-801e-919d-c8bf9ad99a74" style="width:12.5%" class="column"><figure id="103dc177-9d9b-80d7-99ba-cbc1882a998a" class="image"><a href="https://dr-rise.eu/"><img style="width:217px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/image%205.png"/></a></figure></div><div id="022627c7-100a-4a83-b82d-d7a3d2706a83" style="width:54.166666666666686%" class="column"><p id="87c33c2e-4dae-4e6c-998c-e2eb53755783" class=""><strong>D</strong>emand <strong>R</strong>esponse - <strong>R</strong>esidential <strong>I</strong>nnovation for a <strong>S</strong>ustainable <strong>E</strong>nergy system.  DR-RISE&#x27;s main objective is to demonstrate the benefits of DR in the residential sector, not only for the end-consumers but for the overall energy system and the actors involved. We will offer a holistic set of tools and services with a twofold objective: increase energy efficiency via optimal management and demonstrate the benefits (not only economic) of DR. The platform will be demonstrated in three different EU countries, focusing on gathering the most diverse environments (e.g., pre-existing energy communities, smart villages, urban blocks of flats, low-income households, etc.).</p><p id="72cab1c4-d0ea-4703-9026-30c06d4f183f" class="">
-</p></div><div id="2dce7b34-3255-4176-ad63-6fbbfa1f1f6c" style="width:33.333333333333336%" class="column"><p id="3f17e2c3-dda1-442f-afe6-ff047ddf5c3a" class=""><strong>OUR ROLE</strong>:  In DR-RISE, we are responsible for producing forecasts for the consumption of residential households. Accurate forecasts are pivotal to optimizing demand response operations; however, we do not always possess a history for the loads we want to forecast. In this project, we are using <strong>global models</strong> (models trained on a group of similarly generated data) and <strong>hierarchical probabilistic forecasts</strong> (a smart technique to improve forecasts of signals organized in a hierarchy) to improve the forecasts of loads at different levels of aggregations.   </p><p id="ba133d4f-df6e-4dfa-be51-2eeae428c805" class="">
-</p></div></div><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="103dc177-9d9b-808f-a8ea-c080504e94f3"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/tO9kUrDX_400x400.jpg"/></div><div style="width:100%"><h3 id="11264f5f-7328-416a-a347-feeebf344a27" class=""><a href="https://cordis.europa.eu/project/id/101123324">GINNGER</a> - Horizon Europe</h3></div></figure><div id="c528e4e4-3bc7-4652-9403-aa65d0d23a9f" class="column-list"><div id="103dc177-9d9b-806e-a2fd-f46f79c0c6f2" style="width:12.5%" class="column"><figure id="103dc177-9d9b-8008-b93c-c5eb14fbdd6c" class="image"><a href="https://cordis.europa.eu/project/id/101123324"><img style="width:578.65625px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/image%206.png"/></a></figure></div><div id="65bb6368-180e-41d0-9703-b68e6105ccbd" style="width:54.16666666666667%" class="column"><p id="75194eef-acde-4d31-97d2-59a726e4dc0a" class=""><strong>R</strong>e<strong>G</strong>eneratIo<strong>N</strong> of <strong>N</strong>ei<strong>G</strong>hbourhoods through plac<strong>E</strong>-based app<strong>R</strong>oaches. GINNGER will ease the regeneration of neighbourhoods and built environments through the implementation of co-creation processes in heterogeneous stakeholders’ structures. This will facilitate the planification and implementation of actions in local environments, leading to a reduction of social, environmental, technological and economic risks thus to deliver healthy, affordable and sustainable built environments in EU. The project will create positive social impact in neighbourhoods by stablishing and validating the GINNGER co-creation methodology aimed at supporting decision-making procedures for regeneration actions. The co-creation methodology will rely on SSH innovations for social progress and the enhancement of public policies.</p><p id="a8a25f39-4ae7-4158-bf20-f80ca677c999" class="">
-</p></div><div id="e3be8c9e-7f79-4099-8d3f-6fe5593cc6e1" style="width:33.333333333333336%" class="column"><p id="23ffc89d-c296-4ecf-a9f2-cf1447eab788" class=""><strong>OUR ROLE</strong>: In GINNGER our main scope is to create a <strong>planning tool</strong> that supports stakeholders, such as city planners, in the <strong>identification of the techno-economically optimal locations for the installation of EV charging stations</strong>, considering a range of factors as the density of EV traffic in the area, existing infrastructure and the accessibility of the locations. This is complemented by a collaborative planning tool (CoPlan) that enables optimal scenario exploration by providing a <strong>web-interface</strong> to visualise superimposed layers of mobility, building, and energy infrastructures and communicate the impacts of specific strategies to different stakeholders involved in municipal planning. In this way, it will allow a <strong>participatory planning process</strong>, encouraging more stakeholders to understand the infrastructure selection procedure and actively engage in it.</p><p id="b46a02de-6476-4c3d-9616-7c587a08a0e6" class="">
-</p></div></div><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="103dc177-9d9b-8098-871e-c64c326c85cc"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/tO9kUrDX_400x400.jpg"/></div><div style="width:100%"><h3 id="b84d723f-f98b-42a0-942a-2af68a32373a" class=""><a href="https://interped.eu/">INTERPED</a> - Horizon Europe</h3></div></figure><div id="534bd583-0e7e-45e7-8d8a-6ec4c1ff46e9" class="column-list"><div id="103dc177-9d9b-80d4-b167-dc3db563291d" style="width:12.5%" class="column"><figure id="103dc177-9d9b-805c-a1ea-fa0dff07d7b1" class="image"><a href="https://interped.eu/"><img style="width:217px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/image%207.png"/></a></figure></div><div id="a3b0982b-6c4e-4dae-8d2f-74e49d9b5291" style="width:54.16666666666667%" class="column"><p id="7a492ed4-d55f-4165-82db-ea5a955e3069" class=""><strong>INTER</strong>operable cloud-based solution for cross-vector planning and management of <strong>P</strong>ositive <strong>E</strong>nergy <strong>D</strong>istricts. InterPED aims to enable the concept of PEDs via sector coupling, cross-vector integration, demand flexibility and consumer<br/>engagement, while improving utilisation of local RES, storage and excess/waste heat (E/WH) sources. InterPED will couple RES, storage and E/WH sources (community assets) available in the pilots with the necessary know-how and ICT expertise to ensure<br/>improved operation of PEDs and grid robustness. This will allow InterPED’s end users (aggregators, service providers, urban planners) to deliver benefits to both, grid stakeholders (DSO/TSOs) and final consumers (and prosumers). In addition to automated control actions, InterPED intends to engage the consumers via community building (e.g. CECs or RECs), representing a still largely untapped source of flexibility, while enabling them to play an active role in grid balancing.<br/></p><p id="4fef5774-1867-4eb8-80ad-744494bbeb89" class="">
-</p></div><div id="060cd933-0fc0-404f-888d-77e22bb34f65" style="width:33.333333333333336%" class="column"><p id="0cf899f8-7b8b-4f0e-8d37-9ec906ad2b89" class=""><strong>OUR ROLE</strong>: Our team will lead the development of an EV charging orchestration tool and contribute to the creation of an energy management visualization tool. Specifically, our goal is to <strong>develop an innovative data-driven algorithm that optimally schedule EVs charging</strong>, while maximizing PV energy self-consumption and reducing peak demand. This tool will consider user preferences and behavior to ensure user satisfaction while enabling grid stakeholders, like DSOs, to improve grid robustness. On the other hand, the <strong>visualization tool</strong> that will be created will provide citizens with means <strong>to pre-emptively explore what DR would mean for them and their community</strong>, respecting their needs and district characteristics. Finally, we will actively support the Swiss Arena Innovation Community pilot in implementing various solutions developed in InterPED.</p><p id="0d1bd2f1-eb72-4010-b288-fcc5dfe2952a" class="">
-</p></div></div><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="103dc177-9d9b-80df-8668-f1a062c7c463"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/SNSF.png"/></div><div style="width:100%"><h3 id="ca1e5d6d-2fa4-4767-912f-d3da0b428fa7" class="">GARDEN - Swiss National Science Foundation</h3></div></figure><div id="1d8a4e70-03bf-4659-b9f4-7dcb99628ab8" class="column-list"><div id="103dc177-9d9b-8090-8d3f-fb46d2bf089d" style="width:12.5%" class="column"><figure id="103dc177-9d9b-80cf-9ff3-c3fc266ac5d6" class="image"><a href="https://dutpartnership.eu/"><img style="width:578.65625px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/image%208.png"/></a></figure></div><div id="1d240270-edce-4f42-a6e5-464b26f998cb" style="width:54.16666666666667%" class="column"><p id="f42a699b-c39f-4737-8a08-08a936880bb8" class=""><strong>G</strong>rid-<strong>A</strong>ware <strong>D</strong>ecarbonization of electricity-driven <strong>N</strong>eighbourhoods. GARDEN responds to the challenges posed by increasing PV penetration, heat pump adoption, and electric vehicle usage in local electricity grids. Positive Energy Districts (PEDs) currently lack district-level energy management systems, hindering collective<br/>flexibility utilization for increased grid-awareness. GARDEN aims to address these gaps through a replicable governance process, which supports municipalities to create decarbonised neighbourhoods that foster grid resilience by not overstraining local grid<br/>infrastructures and enable access for all citizens to flexible and clean energy assets as well as sustainable e-mobility. The objectives include mainstreaming flexible PEDs through smart energy management algorithms and a flexibility planning tool. Feasibility studies will assess the flexibility potential to enhance grid reliability in three demos in Austria, Switzerland and Turkey.<br/></p><p id="1e4c9beb-6cc5-4983-beb7-23650a7e69a8" class="">
-</p></div><div id="3605490a-26c3-41b3-96c7-a2d9664a8e6e" style="width:33.333333333333336%" class="column"><p id="eed2ccf3-f880-440d-8b15-b1eee78bb851" class=""><strong>OUR ROLE</strong>: In GARDEN, we’re developing an innovative approach to identify promising neighborhoods where smart control of loads, including electric vehicles, can be effectively implemented. This is achieved by simulating controlled devices under different scenarios and configurations and by learning to rank technological solutions in terms of economic return and impact on the electrical grid. This involves a first phase of faithful simulation of multimodal energy systems, including their smart control, and a second phase relying on <strong>machine learning techniques to fast evaluate technological interventions</strong>, including retrofitting, in terms of economic KPIs.  </p><p id="5045cfa9-4657-4423-b7b0-113b4c25ba1d" class="">
-</p></div></div><p id="a0777a43-eaab-4071-9308-4fa0026c5346" class="">
-</p><h1 id="c89b329d-125f-464d-b4cb-df2231c70c80" class="">People</h1><div id="78ff8f1b-7084-44dd-8ff0-cc15d2e37e27" class="column-list"><div id="47bfc98b-1dc9-4396-8cba-9ab4796d2347" style="width:20%" class="column"><figure id="6995c323-579b-41c5-8b4c-1111afe736b1" class="image"><a href="https://www.linkedin.com/in/vascomedici/"><img style="width:240px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/vasco_thumb.png"/></a></figure></div><div id="c844d241-c36b-4afe-8f5f-19b694d412d4" style="width:20%" class="column"><p id="2ea82223-ef90-44ac-9cdd-787c8e292d4b" class=""><strong>Vasco Medici </strong>MSc in micro-engineering EPFL, PhD Neuroinformatics ETHZ Professor for intelligent energy systems – sector head</p><p id="24a759e6-b8a2-49c8-918e-4f67a928a8d5" class="">
-</p></div><div id="4be9ff28-3ec1-4516-9935-67a3409c400a" style="width:20%" class="column"><p id="9c15df68-c882-468d-8ab1-e8a27848b08e" class="">
-</p></div><div id="97cda42e-5691-45c2-a76b-72922c81d358" style="width:20%" class="column"><p id="25c00ff2-32cd-4161-87e9-3834f0737332" class="">
-</p></div><div id="be216614-1119-41c6-af68-3e593672a638" style="width:20%" class="column"><p id="9aa20b13-360a-457d-ae8e-bb544990cb86" class="">
-</p></div></div><div id="7836134f-3ca4-4d40-90f8-d644e97a2053" class="column-list"><div id="5c51a49b-2560-406b-a932-a4fd6f1e977f" style="width:25%" class="column"><h3 id="27be832e-a180-4a8f-9ba6-c96c5af8ad7a" class="">Energy Transition </h3><p id="d5ecd52f-d4e2-41d9-96f5-de4982ba1aea" class="">
-</p><figure id="b69b4f69-c57e-4e1f-a428-fa9f4d18c113" class="image"><a href="https://www.linkedin.com/in/jalomi-maayan-tardif-78886951/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/J.png"/></a></figure><p id="122eb142-853b-41ef-9905-402cbf08f852" class="">
-</p></div><div id="edefad82-9172-4288-b1b1-203171a282ff" style="width:25%" class="column"><p id="07cc4b05-6573-45a1-82bf-8e12d85dc85e" class="">
-</p><p id="800f3c23-f86b-4bd2-9f27-6082432e0539" class="">
-</p><p id="d67fb6eb-a022-42f9-8066-fe357d20f85f" class="">
-</p><p id="70ffd76b-2992-49a9-8c76-d1924ae14beb" class=""><strong>Jalomi Maayan Tardif </strong>MSc in sustainable energy systems KTH and MSc in energy engineering UPC</p><p id="80d02c39-88f8-465b-8bdd-8e572bb1dd4b" class="">Researcher – team head</p><p id="70401b33-0892-4477-98af-30d4e40668fe" class="">
-</p><p id="64768afd-efdb-47bc-9b5d-a4ad989cfe77" class="">
-</p><p id="baa05051-3903-400b-b473-d644a3bb6bc7" class="">
-</p></div><div id="8d4778b3-52fc-4ca9-9e55-f2aea7f50808" style="width:25%" class="column"><h3 id="b84366fc-0d48-4159-9d03-b49d135958cc" class="">Smart Energy Systems </h3><p id="bc3780e0-4193-433d-a398-03837c8f9e43" class="">
-</p><figure id="1d05dd13-d720-4043-a72e-0477476d3734" class="image"><a href="https://www.linkedin.com/in/lorenzonespoli/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/lorenz_thumb.png"/></a></figure></div><div id="9598cd3d-6358-4ee0-88c6-6d59fd457d73" style="width:25%" class="column"><p id="ed86ff73-c3e3-49d5-9084-c9089468659a" class="">
-</p><p id="b1eea7d5-4d1e-4903-8fa7-6a1e840429c4" class="">
-</p><p id="437d1b1a-ea35-4bf2-a749-a479a7fbf7bd" class="">
-</p><p id="4824a081-890e-4621-8bf3-8da64c696ef5" class=""><strong>Lorenzo Nespoli</strong>, MSc in energy engineering Polimi, PhD EDEY EPFL​</p><p id="27d433c6-7cc7-4a74-bacb-a718c2b8ec94" class="">Researcher – team head</p><p id="8cb7f5a8-b770-4f2c-99c2-e0453a6c2fd2" class="">
-</p><p id="8f2a82f4-fa3d-47aa-a046-0fd3639fdcb0" class="">
-</p></div></div><hr id="4cb4db76-b5ac-4aee-b89a-e1496106efb9"/><div id="6e74a255-e98e-4996-99c8-e5c021a7fc53" class="column-list"><div id="e071d12f-3f2e-48ca-b4d2-d4f66afa9dc7" style="width:25%" class="column"><figure id="6ba6d281-21e8-4709-9fd2-870b83da6d8c" class="image"><a href="https://www.linkedin.com/in/matteo-palucci-40259b20b/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/matteo_thumb.png"/></a></figure></div><div id="dd1e12e4-f128-4093-9454-f4b5e206155f" style="width:25%" class="column"><p id="c96d31c4-e317-4734-9fbc-af6febbdbe7f" class=""><strong>Matteo Palucci </strong>MSc in energy engineering Polimi PhD Student ETHZ</p></div><div id="e23acb79-b749-47bf-881c-3b94b2db8194" style="width:25%" class="column"><figure id="4a2cfc92-ee55-4450-9ea5-d67a4669827d" class="image"><a href="https://www.linkedin.com/in/davidestrepparava/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/streppa_thumb.png"/></a></figure></div><div id="be90c400-ca03-4b88-b491-cd4b1c7f141f" style="width:25%" class="column"><p id="e2d7c444-3940-4e4c-a1c8-5e7dde08f765" class=""><strong>Davide Strepparava</strong>, MSc in computer science Polimi​, Researcher</p><p id="c5f9fd7e-7128-436e-9970-1462a09543f1" class="">
-</p></div></div><hr id="98ea08ee-7c5c-46e7-ba28-d922d6351806"/><div id="d96f21fa-9d29-4bca-bcbc-d046da4dea20" class="column-list"><div id="51e6567b-a4f1-45a3-9b0d-87770d3eb11d" style="width:25%" class="column"><figure id="f05b4d32-b6b7-4317-8bae-62f184c617f4" class="image"><a href="https://www.linkedin.com/in/raul-saez-2792a8265/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/raul_thumb.png"/></a></figure><p id="58c230c9-bc1f-424b-a54f-bb881e3f23e6" class="">
-</p></div><div id="4eb0b5a9-2bc1-4797-ae02-f92b65d31e12" style="width:25%" class="column"><p id="646f0501-0639-4155-bf74-24a5587371be" class=""><strong>Raul Saez </strong>PhD candidate<strong> </strong>in optimization &amp; sustainability of energy systems Universitat Rovira i Virgili, Researcher</p></div><div id="f0e1705a-f427-4c34-b5c6-352c6716af0d" style="width:25%" class="column"><figure id="f44af8f7-4e25-4214-bb29-e488a40ea4e7" class="image"><a href="https://www.linkedin.com/in/federicorosato/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/fedez_thumb.png"/></a></figure></div><div id="111b6230-3e40-4471-8106-1f05e0c25ed1" style="width:25%" class="column"><p id="baae6c5e-e188-4661-9812-5e362854d607" class=""><strong>Federico Rosato</strong>, MSc and PhD in energy engineering Polimi​, Researcher</p><p id="2ee08769-1552-45bc-b402-cd8cb4cb2882" class="">
-</p></div></div><hr id="e950b98a-7043-4732-976a-70f940e0c8a7"/><div id="3e90dffe-f4b8-45d9-b544-640fb081ff09" class="column-list"><div id="e715ed17-0e60-4186-b971-79f8426b39a2" style="width:25%" class="column"><p id="758ebbbb-6945-4dcb-b09d-cc594cbb0c03" class="">
-</p></div><div id="f6639376-4f55-4f42-b75d-d4e95df7b6cd" style="width:25%" class="column"><p id="b729d7ed-b1bb-4b2e-9cad-e6a0be68d507" class="">
-</p></div><div id="9fbee4e3-2f0e-4e6b-b032-fba06f47d357" style="width:25%" class="column"><figure id="4a433caf-e518-4d64-9a76-b9939cf445c6" class="image"><a href="https://www.linkedin.com/in/buddiheendeniya/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/buddi_thumb.png"/></a></figure></div><div id="38007b67-a9f5-48ca-b51c-bd087981f3e2" style="width:25%" class="column"><p id="325af768-7481-4a44-a32f-f1b5489553d1" class=""><strong>Charitha Buddhika Heendeniya</strong>, MSc renewable energy engineering and management Uni-Freiburg​, Researcher</p><p id="8d5adc7a-9a73-411b-ad83-adfa78de9b6d" class="">
-</p></div></div><hr id="cf83f32d-cd91-48d1-a216-f334ec1a085d"/><div id="3f085dfa-021d-49ab-adaa-6424701ea224" class="column-list"><div id="d37c327f-bdd7-4d7e-af12-1dc9f17adf25" style="width:25%" class="column"><p id="ed549971-f09d-480c-86e1-bed69980c1e0" class="">
-</p></div><div id="394ebac6-cff8-40a4-ae8c-65c560af2113" style="width:25%" class="column"><p id="b42b814c-df6a-4eb6-a28c-699dc7c42a9b" class="">
-</p></div><div id="92868bf0-0948-4759-bf95-a0c13e14c36c" style="width:25%" class="column"><figure id="ff9ba833-6033-4bed-aee0-47c8d89b803b" class="image"><a href="https://www.linkedin.com/in/roberto-rocchetta-737b857a/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/roberto_thumb_2.png"/></a></figure></div><div id="124da9c7-e7e9-4ec1-b22c-e751f8aaa98c" style="width:25%" class="column"><p id="0cf463ac-228c-4077-a934-94b0117d048a" class=""><strong>Roberto Rocchetta</strong>, MSc and PhD in Risk and Uncertainty University of Liverpool, Researcher ​</p><p id="dc665764-1ed1-445b-8620-6f068fc9e126" class="">
-</p></div></div><hr id="2102cfae-2c39-4dea-9d0f-cb399531a92e"/><div id="491b3b60-edef-410a-8b15-d7b5cea1be3c" class="column-list"><div id="85057122-5101-40ca-a9d3-b0b1e973959d" style="width:25%" class="column"><p id="4f478ccc-233b-41d0-95dc-7dcc0f7fd5f2" class="">
-</p></div><div id="ce0eed0a-c373-4b2f-af97-c24e283cbf67" style="width:25%" class="column"><p id="1f03e983-9767-475c-807f-31dbd45635d2" class="">
-</p></div><div id="4715b367-6f40-4fc0-b6ef-fd07175ee648" style="width:25%" class="column"><figure id="66f907b7-ebaa-4157-99b8-1b67d89c8f53" class="image"><a href="https://www.linkedin.com/in/manuel-perez-estevez/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/matnuel_thumb.png"/></a></figure><p id="0d4fbc0c-6667-43b9-9322-5f3a2086e3bd" class="">
-</p></div><div id="0551be01-20ee-4c0a-b826-c2d9ad52a395" style="width:25%" class="column"><p id="f79cfeff-f4da-4809-845e-bf0b398adaff" class=""><strong>Manuel Perez</strong>, MSc and PhD in energy engineering Free University of Bolzano and Università di Trento, Researcher</p><p id="aeee38bf-9ed2-47f9-b229-c65cdfff92bc" class="">
-</p></div></div><hr id="dac50ef2-38a1-432c-b0da-827b5bcd0f80"/><div id="9e5bf648-c490-4411-83ee-6d7e84f49597" class="column-list"><div id="86c293fb-ffbf-4a83-b9a2-11b7f9e2450c" style="width:25%" class="column"><p id="fefa6233-a56f-4ff0-b10e-7d9d87bd0e21" class="">
-</p></div><div id="dd055a7a-813d-4b71-8b77-11bca2c7500e" style="width:25%" class="column"><p id="3714c46b-5473-4461-aa21-52de57351381" class="">
-</p></div><div id="210dfe08-18b1-440a-9b86-d601fff6b576" style="width:25%" class="column"><figure id="fe9e6a36-fcf9-485c-b6ea-fe5dca457262" class="image"><a href="https://www.linkedin.com/in/anubhab-biswas-308774247/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview%209deaf9ad7cb44bfa97f92b6544d0090b/anubhab_thumb.png"/></a></figure><p id="61c1892d-1e57-4a90-9c44-67f876b58fe5" class="">
-</p></div><div id="2e7a03c7-84ce-4aba-b781-5481f16389b5" style="width:25%" class="column"><p id="f59a269d-2e12-4f9b-8107-123d7ec6bac0" class=""><strong>Anubhab Biswas, </strong>MSc in Statistics, PhD Student at USI-SUPSI</p><p id="ff173773-a3c8-4e55-823e-8176f3da2391" class="">
-</p></div></div><hr id="f06fa8d2-062f-44e1-9e83-13cd3a19a5ac"/></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
+</style><style>@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex-swap.min.css')</style></head><body><article id="9deaf9ad-7cb4-4bfa-97f9-2b6544d0090b" class="page sans"><header><img class="page-cover-image" src="Energy%20System%20Sector%20-%20Overview/Supsi_DACD_ISAAC_Smart_Grid_HiRes-9238_mod.jpg" style="object-position:center 33.89%"/><h1 class="page-title" dir="auto">Energy System Sector - Overview </h1><p class="page-description" dir="auto"></p></header><div class="page-body"><figure id="8397aeb7-400c-4d75-af3c-cd20bf96500d" class="image" style="text-align:left" data-notion-image="Energy%20System%20Sector%20-%20Overview/supsi-logo.svg" dir="ltr"><a href="Energy%20System%20Sector%20-%20Overview/supsi-logo.svg"><img style="width:132px" src="Energy%20System%20Sector%20-%20Overview/supsi-logo.svg"/></a></figure><p id="1d9826c4-f480-41d3-bd2f-2c9cd1360ce8" class="" dir="auto">
+</p><p id="12adc177-9d9b-8062-b62f-c091ac76317b" class="" dir="auto">The Energy Systems Sector is part of the <a href="https://www.supsi.ch/en/isaac">ISAAC institute</a> and operates at both local and international levels, continuously fostering innovation and technological development. The team, composed of experts from diverse disciplines and nationalities, works closely with Swiss polytechnics (ETH Zurich and EPFL) and other significant institutions, both national and international. Noteworthy collaborations include NCCR Automation, a national competence center exploring new approaches for controlling complex automated systems, and the IEA Annex 82 project, focused on energy-flexible buildings for resilient, low-carbon energy systems.</p><p id="12adc177-9d9b-80ea-b9ee-e40781f6f1b9" class="" dir="auto">The sector’s primary goal is achieving the 2050 Energy Strategy, which aims for net-zero greenhouse gas emissions. Activities focus on integrating renewable energies into grids, particularly the electrical grid, and supporting the electrification of key sectors such as mobility and heating. Additionally, the sector is dedicated to developing energy communities, promoting a shared and sustainable use of resources locally, thereby contributing significantly to the country&#x27;s energy transition.</p><p id="12adc177-9d9b-8047-8584-efee49189a70" class="" dir="auto">Collaboration with industry and the public sector, particularly with electric utility companies, is essential for developing practical and applicable solutions. Furthermore, the sector actively works with policymakers, contributing to the definition of sustainable energy policies that support the energy transition.</p><p id="12adc177-9d9b-805e-9f79-f32a3d5b2406" class="" dir="auto">Among its most significant achievements is the founding of <a href="https://www.hivepower.tech/">Hive Power</a>, an innovative startup offering advanced technologies for optimized management of decentralized energy networks. The sector has also won two Watt d&#x27;Or awards from the Swiss Federal Office of Energy, prestigious recognitions for its excellence in energy innovation.</p><h1 id="12adc177-9d9b-80d0-9ab0-e662542b5e93" class="" dir="auto">Our mission</h1><ul id="204bbe2b-a653-481b-843c-22c942f4d52e" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Accelerate the transition to reliable and environmentally sustainable energy systems</li></ul><ul id="95c6e8a8-57ec-49c7-87fb-e457cebea415" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Facilitate their implementation in the built environment</li></ul><ul id="6c78cd34-141a-482c-8200-73f155819806" class="bulleted-list" dir="auto"><li style="list-style-type:disc">Promote the transfer of knowledge to industry, professionals and new generations</li></ul><h1 id="31f806f3-155f-4a22-b8fb-5eeda2f017a2" class="" dir="auto">Research Projects - ongoing </h1><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="103dc177-9d9b-808c-b048-d162caac8b45" dir="ltr"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview/bundesamt_fuer_energie_logo.jpeg"/></div><div style="width:100%"><h3 id="6a599763-7d5d-402e-9bb3-155700eaa862" class="" dir="auto">   <a href="https://www.aramis.admin.ch/Grunddaten/?ProjectID=53864">PROPER-Grids</a> - Swiss Federal Office of Energy </h3></div></aside><div id="dd75a1cb-22ec-4a63-97b7-a958266fcdcf" class="column-list" data-notion-column-list="" dir="auto"><div id="da4555a8-212a-4455-b3f0-56df32182c9d" style="width:12.5%" class="column" data-notion-column-ratio="0.125" dir="auto"><figure id="103dc177-9d9b-80c3-8c2e-f14873b4c37e" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/image.png" dir="ltr"><a href="https://www.aramis.admin.ch/Grunddaten/?ProjectID=53864"><img style="width:240px" src="Energy%20System%20Sector%20-%20Overview/image.png"/></a></figure></div><div id="7851e094-532b-4b33-a6ec-fe3f8306422e" style="width:54.16666666666667%" class="column" data-notion-column-ratio="0.5416666666666667" dir="auto"><p id="d2c3b5f2-871d-40e4-a0b9-5ef31add6ad7" class="" dir="auto"><strong>P</strong>robabilistic <strong>R</strong>isk-informed <strong>OP</strong>erational scheduling for pow<strong>ER</strong> <strong>Grids</strong>. Safe power grid operations are essential to achieve future sustainability goals and, despite the growing need for uncertainty quantification (UQ), deterministic N-1 methods are often used in practice. However, deterministic methods neglect valuable information about the frequencies of disturbances, resulting in overly conservative operations during low-risk scenarios and potentially unsafe when the risks are higher. This project will bridge this gap by introducing an innovative approach for efficient Probabilistic Risk Assessment (PRA) and risk-informed operational planning. Inspired by recent advancements in probabilistic ML, we will develop a new sampling approach to estimate the probability of rare events while accounting for operational-environmental uncertainties and low-probability cascading failures. We will combine the PRA and efficient UQ tools with a high-fidelity simulator of cascading failures and a forecaster module. The novel harmonized framework will serve as the backbone for future risk-informed decision-making under uncertainty, power grid expansion planning, and risk-aware operational scheduling.</p><p id="cb546747-2e2a-4f9d-9db9-8a8092fbc027" class="" dir="auto">
+</p></div><div id="93df16b0-282d-4f1c-944d-a001a4080f0b" style="width:33.333333333333336%" class="column" data-notion-column-ratio="0.33333333333333337" dir="auto"><p id="df61b54a-c195-496e-854e-90d700aef71f" class="" dir="auto"><strong>OUR ROLE</strong>: Our group is overseeing and managing the project. We are also in charge of developing tools for probabilistic risk and safety assessment and for designing decision support systems for risk-aware planning and outage scheduling. This project is a collaboration between SUPSI-ETHZ and SwissGrid.</p><p id="bc206dca-a127-4983-a058-b9943668d9f6" class="" dir="auto">
+</p></div></div><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="f3e30f96-bf48-4be8-aa93-bea6ae2d968a" dir="ltr"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview/bundesamt_fuer_energie_logo.jpeg"/></div><div style="width:100%"><h3 id="bf1ce422-f5a5-4cb2-a13e-5a79e2ad7d22" class="" dir="auto"><a href="https://sweet-sure.ch/">SURE</a> - Swiss Federal Office of Energy </h3></div></aside><div id="a270e2f5-1962-4cb9-91e5-d8d480f56364" class="column-list" data-notion-column-list="" dir="auto"><div id="103dc177-9d9b-80ba-a438-fe520d39099b" style="width:12.5%" class="column" data-notion-column-ratio="0.125" dir="auto"><figure id="103dc177-9d9b-80a1-854e-e9b0c78ce1cb" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/image%201.png" dir="ltr"><a href="https://sweet-sure.ch/"><img style="width:336px" src="Energy%20System%20Sector%20-%20Overview/image%201.png"/></a></figure></div><div id="81ccd285-7786-4f7f-b6eb-e9bc74762f1a" style="width:54.166666666666686%" class="column" data-notion-column-ratio="0.5416666666666669" dir="auto"><p id="aa5e7fbd-729a-4473-bf89-301e39397d3c" class="" dir="auto"><strong>S</strong>ustainable and <strong>R</strong>esilient <strong>E</strong>nergy for <strong>S</strong>witzerland. SURE aims to analyze the sustainability and resilience of Switzerland’s transition to a carbon-free economy by 2050 through an integrated assessment of various dimensions such as environment, natural resources, public health, economics, supply security, and social well-being. The analysis involves a novel analytical framework that utilizes multiple energy models and quantitative tools to develop narratives of long-term pathways and disruptive events that can affect the energy transition. These storylines have been developed based on the status-quo of knowledge and modelling expertise without assigning any preference or likelihood. Four different storylines and disruptive events are developed to assess the system’s performance across sustainability and resilience indicators. Shock scenarios are used to assess the impact of sudden disruptive events on the energy system.</p><p id="65a69b36-d48a-4e46-b27d-47d420ef8169" class="" dir="auto">
+</p></div><div id="2333d902-1091-4941-835b-bcc6e20bae44" style="width:33.333333333333336%" class="column" data-notion-column-ratio="0.33333333333333337" dir="auto"><p id="6d405f64-01cb-41bf-ae2f-22d500793b45" class="" dir="auto"><strong>OUR ROLE</strong>: In the SURE project, we conduct a case study for the canton of Ticino, with our primary contribution being the development of a <strong>socio-technical model</strong> that reflects the region&#x27;s unique landscape. This dynamic model, based on a <strong>system dynamics</strong> approach, taking into account the objectives of various actors within complex systems, and considering the economic, social, and environmental factors that influence their decision-making process. The cantonal case study enables us to pre-test policies and evaluate their effectiveness in supporting the transition to a sustainable energy system, while ensuring coherence between federal and regional pathways that align with the expectations and aspirations of local actors.</p><p id="82611668-38a1-4975-babf-81016a80b7dd" class="" dir="auto">
+</p></div></div><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="3509c347-dec3-48de-b9bd-e3ead6db840e" dir="ltr"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview/tO9kUrDX_400x400.jpg"/></div><div style="width:100%"><h3 id="3541a79b-ad8e-4a66-8acf-823da6e4fb68" class="" dir="auto"><a href="https://fedecom-project.eu/">FEDECOM</a> - Horizon Europe</h3></div></aside><div id="40bb528f-c4f3-4fde-842f-68a06f0a2b73" class="column-list" data-notion-column-list="" dir="auto"><div id="103dc177-9d9b-8011-bf08-f41e8fbd0b18" style="width:12.5%" class="column" data-notion-column-ratio="0.125" dir="auto"><figure id="103dc177-9d9b-8062-9648-ea78102d145f" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/image%202.png" dir="ltr"><a href="https://fedecom-project.eu/"><img style="width:336px" src="Energy%20System%20Sector%20-%20Overview/image%202.png"/></a></figure></div><div id="2f4568c9-4c0e-4d28-9fac-a011ac518122" style="width:54.16666666666667%" class="column" data-notion-column-ratio="0.5416666666666667" dir="auto"><p id="8bfd7ac5-0b37-490d-8e34-76646b20cbd9" class="" dir="auto"><strong>FEDE</strong>rated “system of systems” approach for flexible and interoperable energy <strong>COM</strong>munities. Building on results of recently (or soon to be) concluded EU projects, FEDECOM aims to enable integrated local energy systems through sector coupling and cross-energy vector integration, increasing RES penetration via optimal utilisation of energy dispatch, storage and conversion assets. FEDECOM pursues the idea of electricity becoming the leading energy carrier, with power grids as the<br/>backbone for the decarbonisation of all energy sectors and aggregators as the cornerstone enabler of the potential exploitation.</p><p id="3ebe3324-d55f-4611-899f-38cb2659ae01" class="" dir="auto">
+</p></div><div id="282e7ead-9162-407a-ab83-4e3c3b6b5832" style="width:33.333333333333336%" class="column" data-notion-column-ratio="0.33333333333333337" dir="auto"><p id="2b6e5f09-f7b3-47e9-9c5b-79afaaf86b74" class="" dir="auto"><strong>OUR ROLE</strong>: In FEDECOM, we are responsible for generating <strong>optimizable, data-driven models for the electrical grid</strong>, starting from readings from smart meter data. This is a challenging setting since we cannot exploit information on current and voltage angles to identify our models. Furthermore, producing an optimizable model requires the latter to belong to a class of “well-behaving” functions, such as convex regressors. Our second objective in the project is to set up a <strong>smart settlement</strong> and remuneration module using blockchain-based technology. </p><p id="5969e29b-8775-481e-a6c1-27b8b8c987a3" class="" dir="auto">
+</p></div></div><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="103dc177-9d9b-80cb-82e0-d5013f34502a" dir="ltr"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview/tO9kUrDX_400x400.jpg"/></div><div style="width:100%"><h3 id="d4bc2305-1679-4d55-ad1a-43ec504deabf" class="" dir="auto"><a href="https://reeflexhe.eu/">REEFLEX</a> - Horizon Europe</h3></div></aside><div id="1248d077-165e-4f27-a91c-67745cbc2a84" class="column-list" data-notion-column-list="" dir="auto"><div id="84b2ca90-5287-4166-a4c6-3163a1d26e6e" style="width:12.5%" class="column" data-notion-column-ratio="0.125" dir="auto"><figure id="103dc177-9d9b-803f-86c5-dbcad4b92a6e" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/image%203.png" dir="ltr"><a href="https://reeflexhe.eu/"><img style="width:384px" src="Energy%20System%20Sector%20-%20Overview/image%203.png"/></a></figure></div><div id="921d0f6f-194c-46c9-a936-a96f318486b2" style="width:54.16666666666667%" class="column" data-notion-column-ratio="0.5416666666666667" dir="auto"><p id="f0f9145a-89e6-4755-9ddf-cd09c4db22c8" class="" dir="auto"><strong>RE</strong>plicable, interoperable, cross-sector solutions and Energy services for demand side <strong>FLEX</strong>ibility markets.  The overall objective of REEFLEX is to develop a set of viable interoperable solutions and services that increase the participation of energy consumers in demand side flexibility (DSF) markets. These services and IT tools build on to the development of a central interoperable platform, which acts as an energy marketplace to connect to all types of stakeholders in the cross-sector energy system, facilitating their access to any flexibility market (local, national, European) and providing a set of interactions and services of the catalogue tailor-made for their energy needs. REEFLEX places special emphasis on the demonstration and replication of these solutions in 7 different countries with different energy constrains to ensure interoperability.</p><p id="2de116ee-982a-4fb4-b033-a8e70a7dffbd" class="" dir="auto">
+</p></div><div id="0022c14d-13c2-4d25-b0de-c2c047a33101" style="width:33.333333333333336%" class="column" data-notion-column-ratio="0.33333333333333337" dir="auto"><p id="99f60f90-8127-4899-b04b-ecc2d28c92b6" class="" dir="auto"><strong>OUR ROLE</strong>: In REEFLEX we serve as technical partners in running the Swiss pilot site. Besides data gathering and activities connected to the demonstration, <strong>replication and evaluation</strong> of the proposed solution, we are responsible for the generation of baselines and forecasts for the consumption at the point of delivery (PODs). This task involves the setup of a full pipeline from <strong>data ingestion to model serving via dedicated APIs</strong>.  </p><p id="9a910080-49ec-482b-a695-2a0d680be801" class="" dir="auto">
+</p></div></div><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="103dc177-9d9b-8021-9d87-d6a10f004e44" dir="ltr"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview/tO9kUrDX_400x400.jpg"/></div><div style="width:100%"><h3 id="668ddc26-1912-4a0e-a39d-6d693dafc124" class="" dir="auto"><a href="https://opentunityproject.eu/">OPENTUNITY</a> - Horizon Europe</h3></div></aside><div id="ccc318c0-6a2c-43db-9745-d9d180536cea" class="column-list" data-notion-column-list="" dir="auto"><div id="103dc177-9d9b-80b9-b40e-e66c33d2d11a" style="width:12.5%" class="column" data-notion-column-ratio="0.125" dir="auto"><figure id="103dc177-9d9b-80e3-afae-c1df8eb2cc49" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/image%204.png" dir="ltr"><a href="https://opentunityproject.eu/"><img style="width:578.65625px" src="Energy%20System%20Sector%20-%20Overview/image%204.png"/></a></figure></div><div id="51dd1896-e9d1-4954-b945-a80bf3d4d8d2" style="width:54.16666666666667%" class="column" data-notion-column-ratio="0.5416666666666667" dir="auto"><p id="7a26537b-f835-44c1-909c-041d72e23d6c" class="" dir="auto"><strong>OPEN</strong>ing the electricity ecosystem to multiple actors in order to have a real decarbonization oppor<strong>TUNITY</strong>.<strong>  </strong>OPENTUNITY’s objective is to create a flexibility ecosystem reducing interoperability barriers and favouring the use of standards in order to decarbonize EU grids and put the end-user in the spotlight. Grid operators, prosumers, market actors etc. will be supported by OPENTUNITY via innovative methodologies backed by advanced, interoperable software modules, in order to provide them with new features and services related to: 1) Technologies to boost flexibility in prosumer’s environment; 2) Technologies for grid operators to better manage grid operations).</p><p id="37fa7194-67ff-434d-b286-5b2f81687383" class="" dir="auto">
+</p></div><div id="15c2b13b-21c2-4d04-bc80-ddf9da131549" style="width:33.333333333333336%" class="column" data-notion-column-ratio="0.33333333333333337" dir="auto"><p id="50b56f62-8999-4147-b9da-3dc1ae8070b4" class="" dir="auto"><strong>OUR ROLE</strong>:  In OPENTUNITY, we serve as technical partners in running the Swiss pilot site. Besides this, we are involved in tools for grid operators, providing them with powerful grid monitoring and control that will facilitate knowing the grid status in real-time and analyze the flexibility necessities of the grid and kicking-off DR campaigns. Last, we contribute to the design of an open, secure, and trusted platform for data exchange between energy assets and systems by leveraging the concept of Decentralized Identifiers (DIDs) and Verifiable Credentials (VCs) using blockchain technology.</p><p id="23a8ef0e-5c92-47a5-85dc-77e2c3803fe4" class="" dir="auto">
+</p></div></div><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="103dc177-9d9b-809b-b4eb-e4b08b80b82f" dir="ltr"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview/tO9kUrDX_400x400.jpg"/></div><div style="width:100%"><h3 id="48b77aab-fb87-49e6-834a-93b7fb2f087c" class="" dir="auto"><a href="https://dr-rise.eu/">DR-RISE</a> - Horizon Europe</h3></div></aside><div id="f195afb3-f649-4761-9884-fd1f242d5483" class="column-list" data-notion-column-list="" dir="auto"><div id="103dc177-9d9b-801e-919d-c8bf9ad99a74" style="width:12.5%" class="column" data-notion-column-ratio="0.125" dir="auto"><figure id="103dc177-9d9b-80d7-99ba-cbc1882a998a" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/image%205.png" dir="ltr"><a href="https://dr-rise.eu/"><img style="width:217px" src="Energy%20System%20Sector%20-%20Overview/image%205.png"/></a></figure></div><div id="022627c7-100a-4a83-b82d-d7a3d2706a83" style="width:54.166666666666686%" class="column" data-notion-column-ratio="0.5416666666666669" dir="auto"><p id="87c33c2e-4dae-4e6c-998c-e2eb53755783" class="" dir="auto"><strong>D</strong>emand <strong>R</strong>esponse - <strong>R</strong>esidential <strong>I</strong>nnovation for a <strong>S</strong>ustainable <strong>E</strong>nergy system.  DR-RISE&#x27;s main objective is to demonstrate the benefits of DR in the residential sector, not only for the end-consumers but for the overall energy system and the actors involved. We will offer a holistic set of tools and services with a twofold objective: increase energy efficiency via optimal management and demonstrate the benefits (not only economic) of DR. The platform will be demonstrated in three different EU countries, focusing on gathering the most diverse environments (e.g., pre-existing energy communities, smart villages, urban blocks of flats, low-income households, etc.).</p><p id="72cab1c4-d0ea-4703-9026-30c06d4f183f" class="" dir="auto">
+</p></div><div id="2dce7b34-3255-4176-ad63-6fbbfa1f1f6c" style="width:33.333333333333336%" class="column" data-notion-column-ratio="0.33333333333333337" dir="auto"><p id="3f17e2c3-dda1-442f-afe6-ff047ddf5c3a" class="" dir="auto"><strong>OUR ROLE</strong>:  In DR-RISE, we are responsible for producing forecasts for the consumption of residential households. Accurate forecasts are pivotal to optimizing demand response operations; however, we do not always possess a history for the loads we want to forecast. In this project, we are using <strong>global models</strong> (models trained on a group of similarly generated data) and <strong>hierarchical probabilistic forecasts</strong> (a smart technique to improve forecasts of signals organized in a hierarchy) to improve the forecasts of loads at different levels of aggregations.   </p><p id="ba133d4f-df6e-4dfa-be51-2eeae428c805" class="" dir="auto">
+</p></div></div><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="103dc177-9d9b-808f-a8ea-c080504e94f3" dir="ltr"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview/tO9kUrDX_400x400.jpg"/></div><div style="width:100%"><h3 id="11264f5f-7328-416a-a347-feeebf344a27" class="" dir="auto"><a href="https://cordis.europa.eu/project/id/101123324">GINNGER</a> - Horizon Europe</h3></div></aside><div id="c528e4e4-3bc7-4652-9403-aa65d0d23a9f" class="column-list" data-notion-column-list="" dir="auto"><div id="103dc177-9d9b-806e-a2fd-f46f79c0c6f2" style="width:12.5%" class="column" data-notion-column-ratio="0.125" dir="auto"><figure id="103dc177-9d9b-8008-b93c-c5eb14fbdd6c" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/image%206.png" dir="ltr"><a href="https://cordis.europa.eu/project/id/101123324"><img style="width:578.65625px" src="Energy%20System%20Sector%20-%20Overview/image%206.png"/></a></figure></div><div id="65bb6368-180e-41d0-9703-b68e6105ccbd" style="width:54.16666666666667%" class="column" data-notion-column-ratio="0.5416666666666667" dir="auto"><p id="75194eef-acde-4d31-97d2-59a726e4dc0a" class="" dir="auto"><strong>R</strong>e<strong>G</strong>eneratIo<strong>N</strong> of <strong>N</strong>ei<strong>G</strong>hbourhoods through plac<strong>E</strong>-based app<strong>R</strong>oaches. GINNGER will ease the regeneration of neighbourhoods and built environments through the implementation of co-creation processes in heterogeneous stakeholders’ structures. This will facilitate the planification and implementation of actions in local environments, leading to a reduction of social, environmental, technological and economic risks thus to deliver healthy, affordable and sustainable built environments in EU. The project will create positive social impact in neighbourhoods by stablishing and validating the GINNGER co-creation methodology aimed at supporting decision-making procedures for regeneration actions. The co-creation methodology will rely on SSH innovations for social progress and the enhancement of public policies.</p><p id="a8a25f39-4ae7-4158-bf20-f80ca677c999" class="" dir="auto">
+</p></div><div id="e3be8c9e-7f79-4099-8d3f-6fe5593cc6e1" style="width:33.333333333333336%" class="column" data-notion-column-ratio="0.33333333333333337" dir="auto"><p id="23ffc89d-c296-4ecf-a9f2-cf1447eab788" class="" dir="auto"><strong>OUR ROLE</strong>: In GINNGER our main scope is to create a <strong>planning tool</strong> that supports stakeholders, such as city planners, in the <strong>identification of the techno-economically optimal locations for the installation of EV charging stations</strong>, considering a range of factors as the density of EV traffic in the area, existing infrastructure and the accessibility of the locations. This is complemented by a collaborative planning tool (CoPlan) that enables optimal scenario exploration by providing a <strong>web-interface</strong> to visualise superimposed layers of mobility, building, and energy infrastructures and communicate the impacts of specific strategies to different stakeholders involved in municipal planning. In this way, it will allow a <strong>participatory planning process</strong>, encouraging more stakeholders to understand the infrastructure selection procedure and actively engage in it.</p><p id="b46a02de-6476-4c3d-9616-7c587a08a0e6" class="" dir="auto">
+</p></div></div><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="103dc177-9d9b-8098-871e-c64c326c85cc" dir="ltr"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview/tO9kUrDX_400x400.jpg"/></div><div style="width:100%"><h3 id="b84d723f-f98b-42a0-942a-2af68a32373a" class="" dir="auto"><a href="https://interped.eu/">INTERPED</a> - Horizon Europe</h3></div></aside><div id="534bd583-0e7e-45e7-8d8a-6ec4c1ff46e9" class="column-list" data-notion-column-list="" dir="auto"><div id="103dc177-9d9b-80d4-b167-dc3db563291d" style="width:12.5%" class="column" data-notion-column-ratio="0.125" dir="auto"><figure id="103dc177-9d9b-805c-a1ea-fa0dff07d7b1" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/image%207.png" dir="ltr"><a href="https://interped.eu/"><img style="width:217px" src="Energy%20System%20Sector%20-%20Overview/image%207.png"/></a></figure></div><div id="a3b0982b-6c4e-4dae-8d2f-74e49d9b5291" style="width:54.16666666666667%" class="column" data-notion-column-ratio="0.5416666666666667" dir="auto"><p id="7a492ed4-d55f-4165-82db-ea5a955e3069" class="" dir="auto"><strong>INTER</strong>operable cloud-based solution for cross-vector planning and management of <strong>P</strong>ositive <strong>E</strong>nergy <strong>D</strong>istricts. InterPED aims to enable the concept of PEDs via sector coupling, cross-vector integration, demand flexibility and consumer<br/>engagement, while improving utilisation of local RES, storage and excess/waste heat (E/WH) sources. InterPED will couple RES, storage and E/WH sources (community assets) available in the pilots with the necessary know-how and ICT expertise to ensure<br/>improved operation of PEDs and grid robustness. This will allow InterPED’s end users (aggregators, service providers, urban planners) to deliver benefits to both, grid stakeholders (DSO/TSOs) and final consumers (and prosumers). In addition to automated control actions, InterPED intends to engage the consumers via community building (e.g. CECs or RECs), representing a still largely untapped source of flexibility, while enabling them to play an active role in grid balancing.</p><p id="4fef5774-1867-4eb8-80ad-744494bbeb89" class="" dir="auto">
+</p></div><div id="060cd933-0fc0-404f-888d-77e22bb34f65" style="width:33.333333333333336%" class="column" data-notion-column-ratio="0.33333333333333337" dir="auto"><p id="0cf899f8-7b8b-4f0e-8d37-9ec906ad2b89" class="" dir="auto"><strong>OUR ROLE</strong>: Our team will lead the development of an EV charging orchestration tool and contribute to the creation of an energy management visualization tool. Specifically, our goal is to <strong>develop an innovative data-driven algorithm that optimally schedule EVs charging</strong>, while maximizing PV energy self-consumption and reducing peak demand. This tool will consider user preferences and behavior to ensure user satisfaction while enabling grid stakeholders, like DSOs, to improve grid robustness. On the other hand, the <strong>visualization tool</strong> that will be created will provide citizens with means <strong>to pre-emptively explore what DR would mean for them and their community</strong>, respecting their needs and district characteristics. Finally, we will actively support the Swiss Arena Innovation Community pilot in implementing various solutions developed in InterPED.</p><p id="0d1bd2f1-eb72-4010-b288-fcc5dfe2952a" class="" dir="auto">
+</p></div></div><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="103dc177-9d9b-80df-8668-f1a062c7c463" dir="ltr"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview/SNSF.png"/></div><div style="width:100%"><h3 id="ca1e5d6d-2fa4-4767-912f-d3da0b428fa7" class="" dir="auto">GARDEN - Swiss National Science Foundation</h3></div></aside><div id="1d8a4e70-03bf-4659-b9f4-7dcb99628ab8" class="column-list" data-notion-column-list="" dir="auto"><div id="103dc177-9d9b-8090-8d3f-fb46d2bf089d" style="width:12.5%" class="column" data-notion-column-ratio="0.125" dir="auto"><figure id="103dc177-9d9b-80cf-9ff3-c3fc266ac5d6" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/image%208.png" dir="ltr"><a href="https://dutpartnership.eu/index.php/projects/garden"><img style="width:578.65625px" src="Energy%20System%20Sector%20-%20Overview/image%208.png"/></a></figure><p id="39edc177-9d9b-801d-9698-c91dfbdcaa5b" class="" dir="auto">
+</p></div><div id="1d240270-edce-4f42-a6e5-464b26f998cb" style="width:54.16666666666667%" class="column" data-notion-column-ratio="0.5416666666666667" dir="auto"><p id="f42a699b-c39f-4737-8a08-08a936880bb8" class="" dir="auto"><strong>G</strong>rid-<strong>A</strong>ware <strong>D</strong>ecarbonization of electricity-driven <strong>N</strong>eighbourhoods. GARDEN responds to the challenges posed by increasing PV penetration, heat pump adoption, and electric vehicle usage in local electricity grids. Positive Energy Districts (PEDs) currently lack district-level energy management systems, hindering collective<br/>flexibility utilization for increased grid-awareness. GARDEN aims to address these gaps through a replicable governance process, which supports municipalities to create decarbonised neighbourhoods that foster grid resilience by not overstraining local grid<br/>infrastructures and enable access for all citizens to flexible and clean energy assets as well as sustainable e-mobility. The objectives include mainstreaming flexible PEDs through smart energy management algorithms and a flexibility planning tool. Feasibility studies will assess the flexibility potential to enhance grid reliability in three demos in Austria, Switzerland and Turkey.</p><p id="1e4c9beb-6cc5-4983-beb7-23650a7e69a8" class="" dir="auto">
+</p></div><div id="3605490a-26c3-41b3-96c7-a2d9664a8e6e" style="width:33.333333333333336%" class="column" data-notion-column-ratio="0.33333333333333337" dir="auto"><p id="eed2ccf3-f880-440d-8b15-b1eee78bb851" class="" dir="auto"><strong>OUR ROLE</strong>: In GARDEN, we’re developing an innovative approach to identify promising neighborhoods where smart control of loads, including electric vehicles, can be effectively implemented. This is achieved by simulating controlled devices under different scenarios and configurations and by learning to rank technological solutions in terms of economic return and impact on the electrical grid. This involves a first phase of faithful simulation of multimodal energy systems, including their smart control, and a second phase relying on <strong>machine learning techniques to fast evaluate technological interventions</strong>, including retrofitting, in terms of economic KPIs.  </p><p id="5045cfa9-4657-4423-b7b0-113b4c25ba1d" class="" dir="auto">
+</p></div></div><aside class="block-color-gray_background callout" data-notion-callout="" data-notion-callout-background="gray_background" style="white-space:pre-wrap;display:flex" id="39edc177-9d9b-8015-834d-c936cb501349" dir="ltr"><div style="font-size:1.5em"><img class="icon" src="Energy%20System%20Sector%20-%20Overview/SNSF.png"/></div><div style="width:100%"><h3 id="39edc177-9d9b-80bc-808a-fddf19a5946e" class="" dir="auto"><a href="https://www.pedaid3project.eu/">PEDAID3</a>- Swiss National Science Foundation</h3></div></aside><div id="39edc177-9d9b-8081-9353-d61d901bff7c" class="column-list" data-notion-column-list="" dir="auto"><div id="39edc177-9d9b-8094-bba9-c6164880fa0b" style="width:12.5%" class="column" data-notion-column-ratio="0.125" dir="auto"><figure id="39edc177-9d9b-80b3-8da0-ec57733c019e" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/image%209.png" dir="ltr"><a href="https://dutpartnership.eu/projects/pedaid3"><img style="width:421.00421142578125px" src="Energy%20System%20Sector%20-%20Overview/image%209.png"/></a></figure></div><div id="39edc177-9d9b-8046-9f08-d53b4bbabdca" style="width:54.16666666666667%" class="column" data-notion-column-ratio="0.5416666666666667" dir="auto"><p id="39edc177-9d9b-80c5-8b1d-c4737fdbfa4d" class="" dir="auto">PEDAID3 -<em>Positive Energy District supported by AI and Data-Driven-Decisions</em>- focuses on supporting the development and management of Positive Energy Districts (PEDs) through the use of artificial intelligence, data-driven decision-making and user-centred digital solutions. The project aims to develop a platform that helps cities and stakeholders design, implement and manage PED solutions more effectively, while ensuring that the developed technologies respond to the real needs of end users and urban communities. The project combines technological development with co-creation, stakeholder engagement and socio-economic research. Pilot cities, including Rzeszów, play a central role in testing and validating the developed solutions. The project also supports knowledge exchange between cities and contributes to the wider adoption of PED approaches across Europe.</p><p id="39edc177-9d9b-804a-84c3-d9b5fb335d5b" class="" dir="auto">
+</p></div><div id="39edc177-9d9b-800d-a361-ca5e95a3e594" style="width:33.333333333333336%" class="column" data-notion-column-ratio="0.33333333333333337" dir="auto"><p id="39edc177-9d9b-80c8-b1c8-e7a4da8a228a" class="" dir="auto"><strong>OUR ROLE</strong>: : In PEDAID3, our teams will carry out fundamental research to identify promising <strong>data-driven AI algorithms </strong>for various tasks. SUPSI will focus on the <strong>development, training, selection, a</strong>nd validation of some of these<strong> advanced decision-making models</strong> that support the<br/>operational management and development of PEDs. Additionally, we will be leading and monitoring dissemination activities. Including coordination of efforts towards dissemination, impact and outreach of the results and<br/>knowledge developed during the project.</p><p id="3c3c2acf-d09a-44a7-982a-826fe4274431" class="" dir="auto">
+</p></div></div><h1 id="c89b329d-125f-464d-b4cb-df2231c70c80" class="" dir="auto">People</h1><div id="78ff8f1b-7084-44dd-8ff0-cc15d2e37e27" class="column-list" data-notion-column-list="" dir="auto"><div id="47bfc98b-1dc9-4396-8cba-9ab4796d2347" style="width:20%" class="column" data-notion-column-ratio="0.2" dir="auto"><figure id="6995c323-579b-41c5-8b4c-1111afe736b1" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/vasco_thumb.png" dir="ltr"><a href="https://www.linkedin.com/in/vascomedici/"><img style="width:240px" src="Energy%20System%20Sector%20-%20Overview/vasco_thumb.png"/></a></figure></div><div id="c844d241-c36b-4afe-8f5f-19b694d412d4" style="width:20%" class="column" data-notion-column-ratio="0.2" dir="auto"><p id="2ea82223-ef90-44ac-9cdd-787c8e292d4b" class="" dir="auto"><strong>Vasco Medici </strong>MSc in micro-engineering EPFL, PhD Neuroinformatics ETHZ Professor for intelligent energy systems – sector head</p><p id="24a759e6-b8a2-49c8-918e-4f67a928a8d5" class="" dir="auto">
+</p></div><div id="4be9ff28-3ec1-4516-9935-67a3409c400a" style="width:20%" class="column" data-notion-column-ratio="0.2" dir="auto"><p id="9c15df68-c882-468d-8ab1-e8a27848b08e" class="" dir="auto">
+</p></div><div id="97cda42e-5691-45c2-a76b-72922c81d358" style="width:20%" class="column" data-notion-column-ratio="0.2" dir="auto"><p id="25c00ff2-32cd-4161-87e9-3834f0737332" class="" dir="auto">
+</p></div><div id="be216614-1119-41c6-af68-3e593672a638" style="width:20%" class="column" data-notion-column-ratio="0.2" dir="auto"><p id="9aa20b13-360a-457d-ae8e-bb544990cb86" class="" dir="auto">
+</p></div></div><div id="7836134f-3ca4-4d40-90f8-d644e97a2053" class="column-list" data-notion-column-list="" dir="auto"><div id="5c51a49b-2560-406b-a932-a4fd6f1e977f" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><h3 id="27be832e-a180-4a8f-9ba6-c96c5af8ad7a" class="" dir="auto"><strong>Resilient Systems and Networks</strong></h3><p id="d5ecd52f-d4e2-41d9-96f5-de4982ba1aea" class="" dir="auto">
+</p><figure id="39edc177-9d9b-80a6-9190-c67ab5806766" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/roberto_thumb_2.png" dir="ltr"><a href="https://www.linkedin.com/in/roberto-rocchetta-737b857a/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview/roberto_thumb_2.png"/></a></figure></div><div id="edefad82-9172-4288-b1b1-203171a282ff" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><p id="07cc4b05-6573-45a1-82bf-8e12d85dc85e" class="" dir="auto">
+</p><p id="800f3c23-f86b-4bd2-9f27-6082432e0539" class="" dir="auto">
+</p><p id="d67fb6eb-a022-42f9-8066-fe357d20f85f" class="" dir="auto">
+</p><p id="70ffd76b-2992-49a9-8c76-d1924ae14beb" class="" dir="auto"><strong>Roberto Rocchetta</strong>, MSc and PhD in Risk and Uncertainty University of Liverpool, Researcher </p><p id="80d02c39-88f8-465b-8bdd-8e572bb1dd4b" class="" dir="auto">Researcher – team head</p><p id="70401b33-0892-4477-98af-30d4e40668fe" class="" dir="auto">
+</p><p id="64768afd-efdb-47bc-9b5d-a4ad989cfe77" class="" dir="auto">
+</p><p id="baa05051-3903-400b-b473-d644a3bb6bc7" class="" dir="auto">
+</p></div><div id="8d4778b3-52fc-4ca9-9e55-f2aea7f50808" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><h3 id="b84366fc-0d48-4159-9d03-b49d135958cc" class="" dir="auto">Smart Energy Systems </h3><p id="bc3780e0-4193-433d-a398-03837c8f9e43" class="" dir="auto">
+</p><figure id="1d05dd13-d720-4043-a72e-0477476d3734" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/lorenz_thumb.png" dir="ltr"><a href="https://www.linkedin.com/in/lorenzonespoli/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview/lorenz_thumb.png"/></a></figure></div><div id="9598cd3d-6358-4ee0-88c6-6d59fd457d73" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><p id="ed86ff73-c3e3-49d5-9084-c9089468659a" class="" dir="auto">
+</p><p id="b1eea7d5-4d1e-4903-8fa7-6a1e840429c4" class="" dir="auto">
+</p><p id="437d1b1a-ea35-4bf2-a749-a479a7fbf7bd" class="" dir="auto">
+</p><p id="4824a081-890e-4621-8bf3-8da64c696ef5" class="" dir="auto"><strong>Lorenzo Nespoli</strong>, MSc in energy engineering Polimi, PhD EDEY EPFL</p><p id="27d433c6-7cc7-4a74-bacb-a718c2b8ec94" class="" dir="auto">Researcher – team head</p><p id="8cb7f5a8-b770-4f2c-99c2-e0453a6c2fd2" class="" dir="auto">
+</p><p id="8f2a82f4-fa3d-47aa-a046-0fd3639fdcb0" class="" dir="auto">
+</p></div></div><hr id="4cb4db76-b5ac-4aee-b89a-e1496106efb9" dir="auto"/><div id="6e74a255-e98e-4996-99c8-e5c021a7fc53" class="column-list" data-notion-column-list="" dir="auto"><div id="e071d12f-3f2e-48ca-b4d2-d4f66afa9dc7" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><figure id="6ba6d281-21e8-4709-9fd2-870b83da6d8c" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/matteo_thumb.png" dir="ltr"><a href="https://www.linkedin.com/in/matteo-palucci-40259b20b/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview/matteo_thumb.png"/></a></figure></div><div id="dd1e12e4-f128-4093-9454-f4b5e206155f" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><p id="c96d31c4-e317-4734-9fbc-af6febbdbe7f" class="" dir="auto"><strong>Matteo Palucci </strong>MSc in energy engineering Polimi PhD Student ETHZ</p></div><div id="e23acb79-b749-47bf-881c-3b94b2db8194" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><figure id="4a2cfc92-ee55-4450-9ea5-d67a4669827d" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/streppa_thumb.png" dir="ltr"><a href="https://www.linkedin.com/in/davidestrepparava/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview/streppa_thumb.png"/></a></figure></div><div id="be90c400-ca03-4b88-b491-cd4b1c7f141f" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><p id="e2d7c444-3940-4e4c-a1c8-5e7dde08f765" class="" dir="auto"><strong>Davide Strepparava</strong>, MSc in computer science Polimi, Researcher</p><p id="c5f9fd7e-7128-436e-9970-1462a09543f1" class="" dir="auto">
+</p></div></div><p id="39edc177-9d9b-80ee-8fde-d8e1b7c1ac71" class="" dir="auto">
+</p><hr id="98ea08ee-7c5c-46e7-ba28-d922d6351806" dir="auto"/><div id="d96f21fa-9d29-4bca-bcbc-d046da4dea20" class="column-list" data-notion-column-list="" dir="auto"><div id="51e6567b-a4f1-45a3-9b0d-87770d3eb11d" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><figure id="4a433caf-e518-4d64-9a76-b9939cf445c6" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/buddi_thumb.png" dir="ltr"><a href="https://www.linkedin.com/in/buddiheendeniya/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview/buddi_thumb.png"/></a></figure><p id="58c230c9-bc1f-424b-a54f-bb881e3f23e6" class="" dir="auto">
+</p></div><div id="4eb0b5a9-2bc1-4797-ae02-f92b65d31e12" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><p id="39edc177-9d9b-80e3-b6de-f381ebb402ac" class="" dir="auto"><strong>Charitha Buddhika Heendeniya</strong>, MSc and PhD candidate renewable energy engineering and management Uni-Freiburg, Researcher</p></div><div id="f0e1705a-f427-4c34-b5c6-352c6716af0d" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><figure id="f44af8f7-4e25-4214-bb29-e488a40ea4e7" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/fedez_thumb.png" dir="ltr"><a href="https://www.linkedin.com/in/federicorosato/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview/fedez_thumb.png"/></a></figure></div><div id="111b6230-3e40-4471-8106-1f05e0c25ed1" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><p id="baae6c5e-e188-4661-9812-5e362854d607" class="" dir="auto"><strong>Federico Rosato</strong>, MSc and PhD in energy engineering Polimi, Researcher</p><p id="2ee08769-1552-45bc-b402-cd8cb4cb2882" class="" dir="auto">
+</p></div></div><hr id="2102cfae-2c39-4dea-9d0f-cb399531a92e" dir="auto"/><div id="491b3b60-edef-410a-8b15-d7b5cea1be3c" class="column-list" data-notion-column-list="" dir="auto"><div id="85057122-5101-40ca-a9d3-b0b1e973959d" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><p id="4f478ccc-233b-41d0-95dc-7dcc0f7fd5f2" class="" dir="auto">
+</p></div><div id="ce0eed0a-c373-4b2f-af97-c24e283cbf67" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><p id="1f03e983-9767-475c-807f-31dbd45635d2" class="" dir="auto">
+</p></div><div id="4715b367-6f40-4fc0-b6ef-fd07175ee648" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><figure id="66f907b7-ebaa-4157-99b8-1b67d89c8f53" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/matnuel_thumb.png" dir="ltr"><a href="https://www.linkedin.com/in/manuel-perez-estevez/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview/matnuel_thumb.png"/></a></figure><p id="0d4fbc0c-6667-43b9-9322-5f3a2086e3bd" class="" dir="auto">
+</p></div><div id="0551be01-20ee-4c0a-b826-c2d9ad52a395" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><p id="f79cfeff-f4da-4809-845e-bf0b398adaff" class="" dir="auto"><strong>Manuel Perez</strong>, MSc and PhD in energy engineering Free University of Bolzano and Università di Trento, Researcher</p><p id="aeee38bf-9ed2-47f9-b229-c65cdfff92bc" class="" dir="auto">
+</p></div></div><hr id="dac50ef2-38a1-432c-b0da-827b5bcd0f80" dir="auto"/><div id="9e5bf648-c490-4411-83ee-6d7e84f49597" class="column-list" data-notion-column-list="" dir="auto"><div id="86c293fb-ffbf-4a83-b9a2-11b7f9e2450c" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><p id="fefa6233-a56f-4ff0-b10e-7d9d87bd0e21" class="" dir="auto">
+</p></div><div id="dd055a7a-813d-4b71-8b77-11bca2c7500e" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><p id="3714c46b-5473-4461-aa21-52de57351381" class="" dir="auto">
+</p></div><div id="210dfe08-18b1-440a-9b86-d601fff6b576" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><figure id="fe9e6a36-fcf9-485c-b6ea-fe5dca457262" class="image" data-notion-image="Energy%20System%20Sector%20-%20Overview/anubhab_thumb.png" dir="ltr"><a href="https://www.linkedin.com/in/anubhab-biswas-308774247/"><img style="width:192px" src="Energy%20System%20Sector%20-%20Overview/anubhab_thumb.png"/></a></figure><p id="61c1892d-1e57-4a90-9c44-67f876b58fe5" class="" dir="auto">
+</p></div><div id="2e7a03c7-84ce-4aba-b781-5481f16389b5" style="width:25%" class="column" data-notion-column-ratio="0.25" dir="auto"><p id="f59a269d-2e12-4f9b-8107-123d7ec6bac0" class="" dir="auto"><strong>Anubhab Biswas, </strong>MSc in Statistics, PhD Student at USI-SUPSI</p><p id="ff173773-a3c8-4e55-823e-8176f3da2391" class="" dir="auto">
+</p></div></div><hr id="f06fa8d2-062f-44e1-9e83-13cd3a19a5ac" dir="auto"/></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

@@ -11,7 +11,7 @@ def replace_href_links(file_path, replacements):
         content = file.read()
 
     # Regular expression to match only the href attributes containing the image file name
-    pattern = re.compile(r'(href)="(Energy%20System%20Sector%20-%20Overview%20[0-9a-zA-Z-]+/)([^"]+)"')
+    pattern = re.compile(r'(href)="(Energy%20System%20Sector%20-%20Overview(?:%20[0-9a-zA-Z-]+)?/)([^"]+)"')
 
     # Function to replace the found matches based on the dictionary
     def replace_match(match):
